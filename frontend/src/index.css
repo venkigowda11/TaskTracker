@@ -3,3 +3,10 @@
   width: 80%;
   text-align: center;
 }
+.taskTable {
+  display: flex;
+  justify-content: space-between;
+  width: 300px;
+  margin: 0 auto;
+  padding: 10px;
+}

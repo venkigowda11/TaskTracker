@@ -7,14 +7,22 @@ function App() {
 
   function handlePost(ev) {
     ev.preventDefault();
-    setTasks((prev) => [...prev, { task }]);
+
+    const tempId = Date.now().toString();
+    const temptask = { _id: tempId, task, marked: false };
+    setTasks((prev) => [...prev, temptask]);
+
     fetch("http://localhost:4000/postTask", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ task }),
-    });
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        setTasks((prev) => prev.map((t) => (t._id === tempId ? data : t)));
+      });
     setTask("");
   }
 

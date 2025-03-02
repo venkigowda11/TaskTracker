@@ -1,6 +1,21 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function Task({ tasks, setTasks }) {
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  function handleDelete(id) {
+    fetch(`http://localhost:4000/deleteTask/${id}`, {
+      method: "DELETE",
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log(data);
+        setTasks((prev) => prev.filter((task) => task._id !== id));
+      });
+  }
+
   function fetchTasks() {
     fetch("http://localhost:4000/getTask", {
       method: "GET",
@@ -8,9 +23,6 @@ export default function Task({ tasks, setTasks }) {
       .then((resp) => resp.json())
       .then((data) => setTasks(data));
   }
-  useEffect(() => {
-    fetchTasks();
-  }, []);
 
   function handleToggle(id, currentMarked) {
     console.log("Clicked", id);
@@ -26,22 +38,29 @@ export default function Task({ tasks, setTasks }) {
         "Content-Type": "application/json",
       },
     })
-      .then((resp) => resp.json())
+      .then((resp) => console.log(resp))
       .then(() => fetchTasks()) // Refresh tasks after update
       .catch((error) => console.error("Error updating task:", error));
   }
-
   return (
     <div>
       <p>Task Lists</p>
       {tasks.map((ele) => {
         return (
-          <h1
-            style={{ textDecoration: ele.marked ? "line-through" : "none" }}
-            onClick={() => handleToggle(ele._id, ele.marked)}
+          <div
+            key={ele._id} // Always use a key when mapping
+            className="taskTable"
           >
-            {ele.task}
-          </h1>
+            <div
+              style={{ textDecoration: ele.marked ? "line-through" : "none" }}
+              onClick={() => handleToggle(ele._id, ele.marked)}
+            >
+              {ele.task}
+            </div>
+            <div>
+              <button onClick={() => handleDelete(ele._id)}>Delete</button>
+            </div>
+          </div>
         );
       })}
     </div>
